@@ -1,0 +1,220 @@
+﻿@model List<Books.DTO.BookDescription>
+
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>border</title>
+        <style>
+            .brd {
+                border: 1px solid black;
+                margin-top: 5px;
+                margin-bottom: 5px;
+                margin-left: auto;
+                margin-right: auto;
+                width: 500px;
+                padding-left: 10px;
+            }
+            .center {
+                width: 320px;
+                padding-left: 10px;
+                margin-left: auto;
+                margin-right: auto;
+                width: 500px;
+                padding-left: 10px;
+            }
+            .hor {
+                display: inline;
+                margin-right: 10px;
+                margin-bottom: 10px;
+            }
+            #cat {
+                width: 150px;
+            }
+            button {
+                margin-bottom: 10px;
+            }
+        </style>
+        <script>
+            //функция кнопки переключения страниц
+            function next()
+            {
+                var pageNumber = page.innerHTML;
+                pageNumber++;
+                page.innerHTML = pageNumber;
+                search();
+            }
+
+            //функция кнопки переключения страниц
+            function previous()
+            {
+                var pageNumber = page.innerHTML;
+                if (pageNumber == 1)
+                    return;
+
+                pageNumber--;
+                page.innerHTML = pageNumber;
+                search();
+            }
+
+            //поиск книг
+            function search()
+            {
+                var url = 'https://localhost:7287/book/search';
+                var title = ttl.value;
+                var category = cat.value;
+                var author = auth.value;
+                var pageNumber = page.innerHTML;
+
+                //собираем параметры в url
+                if (title != "" || category != "" || author != "")
+                {
+                    url += "?";
+                    var i = 0;
+                    if (title != "")
+                    {
+                        url += "title=" + title;
+                        i++;
+                    }
+                    if (category != "")
+                    {
+                        if (i > 0)
+                            url += "&";
+                        url += "category=" + category;
+                        i++;
+                    }
+                    if (author != "")
+                    {
+                        if (i > 0)
+                            url += "&";
+                        url += "author=" + author;
+                    }
+                    if (pageNumber != 0)
+                    {
+                        if (i > 0)
+                            url += "&";
+                        url += "pageNumber=" + pageNumber;
+                    }
+                }
+                url = url.replace(/\s/g, '');
+                //асинхронный запрос данных с сервера
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => update(data));
+            };
+
+            //обработка данных с сервера и заполнение страницы
+            function update(books)
+            {
+                bks.replaceChildren();
+                books.forEach((book) => 
+                {
+                    let div = document.createElement('div');
+                    div.className = "brd";
+                    let p1 = document.createElement('p');
+                    p1.innerHTML = "Название: " + book.title;
+                    div.append(p1);
+
+                    let p2 = document.createElement('p');
+                    p2.innerHTML = "Категория: " + book.category;
+                    div.append(p2);
+
+                    let p3 = document.createElement('p');
+                    p3.innerHTML = "Год выпуска: " + book.publishDate;
+                    div.append(p3);
+
+                    let p4 = document.createElement('p');
+                    var lang;
+                    if (book.language == "en")
+                        lang = "Английский";
+                    else if (book.language == "fr")
+                        lang = "Французский";
+                    else if (book.language == "ru")
+                        lang = "Русский";
+                    else
+                        lang = "неизвестно";
+                    p4.innerHTML = "Язык: " + lang;
+                    div.append(p4);
+
+                    let p5 = document.createElement('p');
+                    p5.innerHTML = "количество страниц: " + book.pagesCount;
+                    div.append(p5);
+
+                    let p6 = document.createElement('p');
+                    p6.innerHTML = "Ограничение: старше " + book.ageLimit + " лет";
+                    div.append(p6);
+
+                    let p7 = document.createElement('p');
+                    p7.innerHTML = "Авторы: ";
+                    div.append(p7);
+
+                    book.authors.forEach((author) => 
+                    {
+                        let p8 = document.createElement('p');
+                        if (author.language == "en")
+                            lang = "Англия";
+                        else if (author.language == "fr")
+                            lang = "Франция";
+                        else if (author.language == "ru")
+                            lang = "Россия";
+                        else
+                            lang = "н/н";
+                        p8.innerHTML = "&emsp;&emsp;" + author.name + ", " + lang;
+                        div.append(p8);
+                    });
+
+                    bks.append(div);
+                });
+            };
+
+            //асинхронный запрос списка категорий и заполнение выпадающего списка
+            function containList()
+            {
+                var url = 'https://localhost:7287/book/category';
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach((category) =>
+                        {
+                            let opt = document.createElement('option');
+                            opt.innerHTML = category;
+                            cat.append(opt);
+                        });
+                    });
+            }
+            containList();
+        </script>
+    </head>
+    
+    <body>
+        <div>
+            <div class="center">
+                <h1>Библиотека</h1>
+                <button id="btn" onclick="search()">Поиск</button>
+                
+                <p>Фильтры:</p>
+                <div>
+                    <p class="hor">Название книги:</p>
+                    <input id="ttl" class="hor" width="100"/>
+                </div>
+                <div>
+                    <p class="hor">Категория:</p>
+                    <select id="cat" class="hor"></select>
+                </div>
+                <div>
+                    <p class="hor">Автор:</p>
+                    <input id="auth" class="hor"/>
+                </div>
+
+                <p>Страницы:</p>
+                <div>
+                    <button class="hor" onclick="previous()">Предыдущая</button>
+                    <p id="page" class="hor">1</p>
+                    <button class="hor" onclick="next()">Следующая</button>
+                </div>
+            </div>
+            <div class="center">
+                <div id="bks" class="center"></div>
+            </div>
+        </div>
+    </body>
+</html>

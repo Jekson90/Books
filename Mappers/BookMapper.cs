@@ -5,6 +5,11 @@ namespace Mappers
 {
     public static class BookMapper
     {
+        /// <summary>
+        /// Model to Entity
+        /// </summary>
+        /// <param name="bookModel"></param>
+        /// <returns></returns>
         public static BookEntity GetBookEntity(this BookModel bookModel)
         {
             return new BookEntity()
@@ -20,6 +25,11 @@ namespace Mappers
             };
         }
 
+        /// <summary>
+        /// Entity to model
+        /// </summary>
+        /// <param name="bookEntity"></param>
+        /// <returns></returns>
         public static BookModel GetBookModel(this BookEntity bookEntity)
         {
             return new BookModel()

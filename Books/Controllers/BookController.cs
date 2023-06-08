@@ -30,6 +30,7 @@ namespace Books.Controllers
         public IActionResult GetBooks(string title = "", string category = "", string author = "", int count = 5, int pageNumber = 0)
         {
             LogRequest(Request);
+
             try
             {
                 if (count == 0)
@@ -130,7 +131,7 @@ namespace Books.Controllers
         }
 
         /// <summary>
-        /// Настройка источника данных, путь из конфигурации
+        /// Настройка источника данных
         /// </summary>
         private void SetJson()
         {

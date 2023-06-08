@@ -19,7 +19,7 @@ namespace Interfaces
         /// <summary>
         /// Настройка ридера источника данных
         /// </summary>
-        /// <param name="path"></param>
+        /// <param name="path">Полный путь к файлу</param>
         void SetJsonReader(string path);
     }
 }

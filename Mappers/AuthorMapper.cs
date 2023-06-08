@@ -5,6 +5,11 @@ namespace Mappers
 {
     public static class AuthorMapper
     {
+        /// <summary>
+        /// Entity to Model
+        /// </summary>
+        /// <param name="authorEntity"></param>
+        /// <returns></returns>
         public static AuthorModel GetAuthorModel(this AuthorEntity authorEntity)
         {
             return new AuthorModel()
@@ -14,6 +19,11 @@ namespace Mappers
             };
         }
 
+        /// <summary>
+        /// Model to Entity
+        /// </summary>
+        /// <param name="authorModel"></param>
+        /// <returns></returns>
         public static AuthorEntity GetAuthorEntity(this AuthorModel authorModel)
         {
             return new AuthorEntity()

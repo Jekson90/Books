@@ -1,8 +1,8 @@
-﻿using FileReader;
-using Models;
+﻿using Models;
 using Mappers;
 using Interfaces;
 using Models.Search;
+using FileReader.Json;
 
 namespace CrudService
 {
@@ -22,10 +22,12 @@ namespace CrudService
 
         public List<BookModel> GetBooks(SearchParameters parameters)
         {
-            if (_jsonReader == null)
-                throw new IOException("JsonReader didn't set");
+            CheckJson();
 
-            var booksEntity = _jsonReader.GetAllBooks();
+            var booksEntity = _jsonReader!.GetAllBooks();
+            if (booksEntity == null)
+                throw new FileLoadException("Can't read JSON file");
+
             return booksEntity.Where(x => x.Title.ToLower().Contains(parameters.Title.ToLower()) || string.IsNullOrEmpty(parameters.Title))
                               .Where(x => x.Category.Replace(" ","") == parameters.Category || parameters.Category == "Все")
                               .Where(x => x.Authors.Any(x => x.Name.ToLower().Contains(parameters.Author.ToLower())) || string.IsNullOrEmpty(parameters.Author))
@@ -37,9 +39,21 @@ namespace CrudService
 
         public List<string> GetCategories()
         {
+            CheckJson();
+            
             var categories = new List<string> { "Все" };
-            categories.AddRange(_jsonReader.GetAllBooks().GroupBy(x => x.Category).Select(x => x.Key));
+            var books = _jsonReader!.GetAllBooks();
+
+            if (books != null)
+                categories.AddRange(books.GroupBy(x => x.Category).Select(x => x.Key));
+
             return categories;
+        }
+
+        private void CheckJson()
+        {
+            if (_jsonReader == null)
+                throw new IOException("JsonReader didn't set");
         }
     }
 }
